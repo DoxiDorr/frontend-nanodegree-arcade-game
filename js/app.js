@@ -1,3 +1,12 @@
+/*
+Sets an initial player score of 0. The game is won when
+the player reaches a score of 5
+*/
+
+var score = 0;
+document.getElementById("playerScore").innerHTML = score;
+
+
 // Enemies our player must avoid
 var Enemy = function(x, y, speed) {
     // Variables applied to each of our instances go here,
@@ -20,6 +29,12 @@ Enemy.prototype.update = function(dt) {
     if (this.x > 550) {
         this.x = -100;
         this.speed = 100 + Math.floor(Math.random() * 512);
+    }
+    // collision handler - checks if player collides with an enemy
+    // if that is the case then position is set to beginning
+    if (this.x < player.x + 30 && this.x + 60 > player.x && this.y < player.y + 60 && this.y + 40 > player.y) {
+      player.x = 200;
+      player.y = 380;
     }
 };
 
@@ -53,15 +68,26 @@ Player.prototype.update = function () {
     }
 
     // Check for player reaching top of canvas and winning the game
+    // if top is reached then 1 is added to score and position of player
+    // is set to the beginning
+    // winTheGame is a function which checks if a score of five is reached
+    // if yes then game is won
+
     if (this.y < 0) {
+        score++;
+        document.getElementById("playerScore").innerHTML = score;
         this.x = 200;
         this.y = 380;
+        winTheGame();
     }
 }
 
 Player.prototype.render = function () {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
+
+// function that takes the pressed button as input
+// moves the character around the canvas
 
 Player.prototype.handleInput = function (keyPress) {
     if (keyPress == "left") {
@@ -86,7 +112,7 @@ Player.prototype.handleInput = function (keyPress) {
 var allEnemies = [];
 var enemyPosition = [60, 140, 220, 300];
 var player = new Player (200, 380, 50);
-var enemy;
+
 
 enemyPosition.forEach(function(posY) {
     enemy = new Enemy(0, posY, 100 + Math.floor(Math.random() * 512));
@@ -102,6 +128,16 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+// alert to show player that he has won
+// resets score to null
+
+winTheGame = function () {
+  if (score == 5) {
+    alert("You won! Press ok to play again.");
+    score = 0;
+    document.getElementById("playerScore").innerHTML = score;
+  }
+}
